@@ -1,2 +1,2 @@
 # lktat1005.github.io
-This is my code leaning space.
+This is my code learning space.
