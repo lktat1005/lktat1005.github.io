@@ -1,2 +1,113 @@
-<h1>Hello World</h1>
-<p>This is my place.</p>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCF 估值工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input, button {
+            margin: 5px 0;
+            padding: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>DCF 估值工具</h1>
+    <form id="dcfForm">
+        <label for="cashFlow">預計現金流 (每年):</label>
+        <input type="number" id="cashFlow" required>
+
+        <label for="growthRate">預計未來5增長率 (%):</label>
+        <input type="number" id="growthRate" required>
+
+        <label for="discountRate">折現率WACC (%):</label>
+        <input type="number" id="discountRate" required>
+
+        <label for="expectedDiscountRate">期望折現率 (%):</label>
+        <input type="number" id="expectedDiscountRate" required>
+
+        <label for="perpetualGrowthRate">永久增長率 (%):</label>
+        <input type="number" id="perpetualGrowthRate" required>
+
+        <label for="cashAndInvestments">現金及短期投資:</label>
+        <input type="number" id="cashAndInvestments" required>
+
+        <label for="totalDebt">總負債:</label>
+        <input type="number" id="totalDebt" required>
+
+        <label for="sharesOutstanding">已發行股份數:</label>
+        <input type="number" id="sharesOutstanding" required>
+
+        <label for="currentStockPrice">股票現時價格:</label>
+        <input type="number" id="currentStockPrice" required>
+
+        <button type="button" onclick="calculateDCF()">計算 DCF</button>
+    </form>
+
+    <h2 id="result"></h2>
+    <h3>計算結果:</h3>
+    <div id="cashFlows"></div>
+    <div id="terminalValue"></div>
+    <div id="enterpriseValue"></div>
+    <div id="equityValue"></div>
+    <div id="stockPrice"></div>
+    <div id="marginOfSafety"></div>
+
+    <script>
+        function calculateDCF() {
+            const cashFlow = parseFloat(document.getElementById('cashFlow').value);
+            const growthRate = parseFloat(document.getElementById('growthRate').value) / 100;
+            const discountRate = parseFloat(document.getElementById('discountRate').value) / 100;
+            const expectedDiscountRate = parseFloat(document.getElementById('expectedDiscountRate').value) / 100;
+            const perpetualGrowthRate = parseFloat(document.getElementById('perpetualGrowthRate').value) / 100;
+            const cashAndInvestments = parseFloat(document.getElementById('cashAndInvestments').value);
+            const totalDebt = parseFloat(document.getElementById('totalDebt').value);
+            const sharesOutstanding = parseFloat(document.getElementById('sharesOutstanding').value);
+            const currentStockPrice = parseFloat(document.getElementById('currentStockPrice').value);
+
+            let dcf = 0;
+            let cashFlowsOutput = '<ul>';
+            let cashFlows = []; // 用於存儲每年的現金流
+            for (let year = 1; year <= 10; year++) {
+                const futureCashFlow = cashFlow * Math.pow(1 + growthRate, year);
+                cashFlowsOutput += `<li>第 ${year} 年現金流: $${futureCashFlow.toFixed(2)}</li>`;
+                cashFlows.push(futureCashFlow); // 存儲現金流
+                dcf += futureCashFlow / Math.pow(1 + discountRate, year);
+            }
+            cashFlowsOutput += '</ul>';
+
+            // 計算第10年的終值
+            const terminalValue = (cashFlow * Math.pow(1 + growthRate, 10) * (1 + perpetualGrowthRate)) / (expectedDiscountRate - perpetualGrowthRate);
+            dcf += terminalValue / Math.pow(1 + expectedDiscountRate, 10);
+
+            document.getElementById('result').innerText = `估計 DCF: $${dcf.toFixed(2)}`;
+            document.getElementById('cashFlows').innerHTML = cashFlowsOutput;
+            document.getElementById('terminalValue').innerText = `第 10 年的終值: $${terminalValue.toFixed(2)}`;
+
+            // 計算企業價值
+            const npv = cashFlows.reduce((acc, cashFlow, index) => {
+                return acc + (cashFlow / Math.pow(1 + expectedDiscountRate, index + 1));
+            }, 0) + (terminalValue / Math.pow(1 + expectedDiscountRate, 10));
+
+            document.getElementById('enterpriseValue').innerText = `企業價值: $${npv.toFixed(2)}`;
+
+            // 計算股權價值
+            const equityValue = npv + cashAndInvestments - totalDebt;
+            document.getElementById('equityValue').innerText = `股權價值: $${equityValue.toFixed(2)}`;
+
+            // 計算股票當前合理價
+            const stockPrice = equityValue / sharesOutstanding;
+            document.getElementById('stockPrice').innerText = `股票當前合理價: $${stockPrice.toFixed(2)}`;
+
+            // 計算安全邊際
+            const marginOfSafety = ((stockPrice - currentStockPrice) / currentStockPrice) * 100;
+            document.getElementById('marginOfSafety').innerText = `安全邊際: ${marginOfSafety.toFixed(2)}%`;
+        }
+    </script>
+</body>
+</html>
