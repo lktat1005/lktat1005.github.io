@@ -3,78 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCF 估值工具</title>
+    <title>Tat的估值機</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 20px;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1 {
+            text-align: center;
+            color: #32ff7e;
+        }
+        h4 {
+            text-align: center;
+            color: #7d5fff;
+        }
+        h5 {
+            text-align: center;
+            color: #747d8c;
+        }
+        form {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
         }
         input, button {
-            margin: 5px 0;
+            margin: 10px 0;
             padding: 10px;
             width: 100%;
+            border: 1px solid #333;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+            font-size:16px;
+            font-weight: bold;
+        }
+        button {
+            background-color: #32ff7e;
+            color: #121212;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size:20px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #3ae374;
+        }
+        h2, h3 {
+            text-align: center;
+            color: #747d8c;
+        }
+         #result, #cashFlows, #terminalValue, #enterpriseValue, #equityValue {
+            margin: 20px 0;
+            padding: 15px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            margin-left: 20px; /* 左邊距 */
+            margin-right: 20px; /* 右邊距 */
+            text-align: center;
+            font-size:16px;
+            display: none;
+        }
+          #stockPrice, #marginOfSafety {
+            margin: 20px 0;
+            padding: 15px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            margin-left: 20px; /* 左邊距 */
+            margin-right: 20px; /* 右邊距 */
+            text-align: center;
+            font-size:24px;
+            font-weight: bold;
         }
         .status {
             padding: 10px;
             margin-top: 10px;
-            color: white;
             font-weight: bold;
             display: inline-block;
+            text-align: center;
+            font-size:16px;
         }
         .sell {
-            background-color: red;
+            background-color: #7d5fff; /* Red */
+            color: #ffffff;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            text-align: center;
+            font-size:20px;
         }
         .hold {
-            background-color: yellow;
-            color: black; /* 文字顏色改為黑色以提高可讀性 */
+            background-color: #4b4b4b; /* Grey */
+            color: #ffffff;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            text-align: center;
+            font-size:20px;
         }
         .buy {
-            background-color: green;
+            background-color: #18dcff; /* Blue */
+            color: #ffffff;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            text-align: center;
+            font-size:20px;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            form {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h4, h5 {
+                font-size: 24px;
+                font-weight: bold;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>DCF 估值工具</h1>
+    <h1>【 現金流量折現法 DCF 】</h1>
     <form id="dcfForm">
-        <label for="cashFlow">自由現金流(TTM):</label>
+        <label for="cashFlow">自由現金流(TTM)</label>
         <input type="number" id="cashFlow" required>
 
-        <label for="growthRate">預計未來五年增長率 (%):</label>
+        <label for="growthRate">預計未來五年增長率 (%)</label>
         <input type="number" id="growthRate" required>
 
-        <label for="discountRate">折現率WACC (%):</label>
+        <label for="discountRate">折現率WACC (%)</label>
         <input type="number" id="discountRate" required>
 
-        <label for="expectedDiscountRate">期望折現率 (%):</label>
+        <label for="expectedDiscountRate">期望折現率 (%)</label>
         <input type="number" id="expectedDiscountRate" required>
 
-        <label for="perpetualGrowthRate">永久增長率 (%):</label>
+        <label for="perpetualGrowthRate">永久增長率 (%)</label>
         <input type="number" id="perpetualGrowthRate" required>
 
-        <label for="cashAndInvestments">現金及短期投資:</label>
+        <label for="cashAndInvestments">現金及短期投資</label>
         <input type="number" id="cashAndInvestments" required>
 
-        <label for="totalDebt">總負債:</label>
+        <label for="totalDebt">總負債</label>
         <input type="number" id="totalDebt" required>
 
-        <label for="sharesOutstanding">已發行股份數:</label>
+        <label for="sharesOutstanding">已發行股份數</label>
         <input type="number" id="sharesOutstanding" required>
 
-        <label for="currentStockPrice">股票現時價格:</label>
+        <label for="currentStockPrice">現時股價</label>
         <input type="number" id="currentStockPrice" required>
 
-        <button type="button" onclick="calculateDCF()">計算 DCF</button>
-    </form>
-
-    <h2 id="result"></h2>
-    <h3>計算結果:</h3>
+        <button type="button" onclick="calculateDCF()">開 始 計 算</button>
+     <h2 id="result"></h2>
+    <h3>▲ 計 算 結 果 ▼</h3>
     <div id="cashFlows"></div>
     <div id="terminalValue"></div>
     <div id="enterpriseValue"></div>
     <div id="equityValue"></div>
-    <div id="stockPrice"></div>
-    <div id="marginOfSafety"></div>
+    <h5 id="stockPrice"></h5>
+    <h4 id="marginOfSafety"></h4>
     <div id="investmentStatus" class="status"></div>
+    </form>
 
     <script>
         function calculateDCF() {
@@ -90,43 +197,37 @@
 
             let dcf = 0;
             let cashFlowsOutput = '<ul>';
-            let cashFlows = []; // 用於存儲每年的現金流
+            let cashFlows = [];
             for (let year = 1; year <= 10; year++) {
                 const futureCashFlow = cashFlow * Math.pow(1 + growthRate, year);
-                cashFlowsOutput += `<li>第 ${year} 年現金流: $${futureCashFlow.toFixed(2)}</li>`;
-                cashFlows.push(futureCashFlow); // 存儲現金流
+                cashFlowsOutput += `<li>第 ${year} 年現金流 $${futureCashFlow.toFixed(2)}</li>`;
+                cashFlows.push(futureCashFlow);
                 dcf += futureCashFlow / Math.pow(1 + discountRate, year);
             }
             cashFlowsOutput += '</ul>';
 
-            // 計算第10年的終值
             const terminalValue = (cashFlow * Math.pow(1 + growthRate, 10) * (1 + perpetualGrowthRate)) / (expectedDiscountRate - perpetualGrowthRate);
             dcf += terminalValue / Math.pow(1 + expectedDiscountRate, 10);
 
-            document.getElementById('result').innerText = `估計 DCF: $${dcf.toFixed(2)}`;
+            document.getElementById('result').innerText = `估計 DCF $${dcf.toFixed(2)}`;
             document.getElementById('cashFlows').innerHTML = cashFlowsOutput;
-            document.getElementById('terminalValue').innerText = `第 10 年的終值: $${terminalValue.toFixed(2)}`;
+            document.getElementById('terminalValue').innerText = `第 10 年的終值 $${terminalValue.toFixed(2)}`;
 
-            // 計算企業價值
             const npv = cashFlows.reduce((acc, cashFlow, index) => {
                 return acc + (cashFlow / Math.pow(1 + expectedDiscountRate, index + 1));
             }, 0) + (terminalValue / Math.pow(1 + expectedDiscountRate, 10));
 
-            document.getElementById('enterpriseValue').innerText = `企業價值: $${npv.toFixed(2)}`;
+            document.getElementById('enterpriseValue').innerText = `企業價值 $${npv.toFixed(2)}`;
 
-            // 計算股權價值
             const equityValue = npv + cashAndInvestments - totalDebt;
-            document.getElementById('equityValue').innerText = `股權價值: $${equityValue.toFixed(2)}`;
+            document.getElementById('equityValue').innerText = `股權價值 $${equityValue.toFixed(2)}`;
 
-            // 計算股票當前合理價
             const stockPrice = equityValue / sharesOutstanding;
-            document.getElementById('stockPrice').innerText = `股票當前合理價: $${stockPrice.toFixed(2)}`;
+            document.getElementById('stockPrice').innerText = `股票合理價 $${stockPrice.toFixed(2)}`;
 
-            // 計算安全邊際
             const marginOfSafety = ((stockPrice - currentStockPrice) / currentStockPrice) * 100;
-            document.getElementById('marginOfSafety').innerText = `安全邊際: ${marginOfSafety.toFixed(2)}%`;
+            document.getElementById('marginOfSafety').innerText = `安全邊際 ${marginOfSafety.toFixed(2)}%`;
 
-            // 根據安全邊際顯示投資建議
             const investmentStatus = document.getElementById('investmentStatus');
             if (marginOfSafety < 0) {
                 investmentStatus.innerText = 'SELL';
