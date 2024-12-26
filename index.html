@@ -14,15 +14,32 @@
             padding: 10px;
             width: 100%;
         }
+        .status {
+            padding: 10px;
+            margin-top: 10px;
+            color: white;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .sell {
+            background-color: red;
+        }
+        .hold {
+            background-color: yellow;
+            color: black; /* 文字顏色改為黑色以提高可讀性 */
+        }
+        .buy {
+            background-color: green;
+        }
     </style>
 </head>
 <body>
     <h1>DCF 估值工具</h1>
     <form id="dcfForm">
-        <label for="cashFlow">預計現金流 (每年):</label>
+        <label for="cashFlow">自由現金流(TTM):</label>
         <input type="number" id="cashFlow" required>
 
-        <label for="growthRate">預計未來5增長率 (%):</label>
+        <label for="growthRate">預計未來五年增長率 (%):</label>
         <input type="number" id="growthRate" required>
 
         <label for="discountRate">折現率WACC (%):</label>
@@ -57,6 +74,7 @@
     <div id="equityValue"></div>
     <div id="stockPrice"></div>
     <div id="marginOfSafety"></div>
+    <div id="investmentStatus" class="status"></div>
 
     <script>
         function calculateDCF() {
@@ -107,6 +125,22 @@
             // 計算安全邊際
             const marginOfSafety = ((stockPrice - currentStockPrice) / currentStockPrice) * 100;
             document.getElementById('marginOfSafety').innerText = `安全邊際: ${marginOfSafety.toFixed(2)}%`;
+
+            // 根據安全邊際顯示投資建議
+            const investmentStatus = document.getElementById('investmentStatus');
+            if (marginOfSafety < 0) {
+                investmentStatus.innerText = 'SELL';
+                investmentStatus.className = 'status sell';
+            } else if (marginOfSafety >= 1 && marginOfSafety <= 15) {
+                investmentStatus.innerText = 'HOLD';
+                investmentStatus.className = 'status hold';
+            } else if (marginOfSafety > 15) {
+                investmentStatus.innerText = 'BUY';
+                investmentStatus.className = 'status buy';
+            } else {
+                investmentStatus.innerText = '';
+                investmentStatus.className = 'status';
+            }
         }
     </script>
 </body>
